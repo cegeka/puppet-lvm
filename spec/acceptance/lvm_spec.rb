@@ -10,26 +10,31 @@ describe 'lvm' do
         manage_pkg      => true
       }
 
+      package { 'e2fsprogs':
+        ensure => present
+      }
+
       exec { 'create_lvm.fs':
         command => '/bin/dd if=/dev/zero of=/dev/lvm.fs bs=1024k count=1',
-        creates => '/root/lvm.fs',
+        creates => '/dev/lvm.fs',
         require => Class['::lvm']
       }
 
       exec { 'create_loop.fs':
         command => '/sbin/losetup /dev/loop6 /dev/lvm.fs',
         creates => '/dev/loop6',
-        require => Exec['create_lvm.fs']
+        require => [Exec['create_lvm.fs'],Package['e2fsprogs']]
       }
 
       exec { 'scan_vg':
-        command => '/usr/sbin/vgscan',
+        command => '/sbin/vgscan',
+        unless  => '/sbin/vgs | grep myvg',
         require => Exec['create_loop.fs']
       }
 
       physical_volume { '/dev/loop6':
         ensure  => present,
-        require => Exec['vgscan']
+        require => Exec['scan_vg']
       }
 
       volume_group { 'myvg':
@@ -40,7 +45,7 @@ describe 'lvm' do
       logical_volume { 'mylv':
         ensure       => present,
         volume_group => 'myvg',
-        size         => '100K',
+        size         => '4096K',
       }
       EOS
 
