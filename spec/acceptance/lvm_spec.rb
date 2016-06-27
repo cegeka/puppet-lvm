@@ -5,6 +5,8 @@ describe 'lvm' do
   describe 'running puppet code' do
     it 'should work with no errors' do
       pp = <<-EOS
+      include lvm
+
       exec { 'create_lvm.fs':
         command => '/bin/dd if=/dev/zero of=/root/lvm.fs bs=1024k count=1',
         creates => '/root/lvm.fs',
