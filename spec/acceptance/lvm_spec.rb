@@ -62,7 +62,7 @@ describe 'lvm' do
     end
 
     describe file '/dev/mapper/myvg-mylv' do
-      it { is_expected.to be_file }
+      it { is_expected.to be_block_device }
     end
 
   end
