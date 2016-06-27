@@ -11,25 +11,30 @@ describe 'lvm' do
       }
 
       exec { 'create_lvm.fs':
-        command => '/bin/dd if=/dev/zero of=/dev/sdx bs=1024k count=1',
+        command => '/bin/dd if=/dev/zero of=/dev/lvm.fs bs=1024k count=1',
         creates => '/root/lvm.fs',
         require => Class['::lvm']
       }
 
       exec { 'create_loop.fs':
-        command => '/sbin/losetup /dev/loop7 /dev/sdx',
-        creates => '/dev/loop7',
+        command => '/sbin/losetup /dev/loop6 /dev/lvm.fs',
+        creates => '/dev/loop6',
         require => Exec['create_lvm.fs']
       }
 
-      physical_volume { '/dev/loop7':
-        ensure  => present,
+      exec { 'scan_vg':
+        command => '/usr/sbin/vgscan',
         require => Exec['create_loop.fs']
+      }
+
+      physical_volume { '/dev/loop6':
+        ensure  => present,
+        require => Exec['vgscan']
       }
 
       volume_group { 'myvg':
         ensure           => present,
-        physical_volumes => '/dev/loop7',
+        physical_volumes => '/dev/loop6',
       }
 
       logical_volume { 'mylv':
