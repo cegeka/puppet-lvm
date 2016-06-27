@@ -32,6 +32,7 @@ describe 'lvm' do
         require => Exec['create_loop.fs']
       }
 
+
       physical_volume { '/dev/loop6':
         ensure  => present,
         require => Exec['scan_vg']
@@ -46,6 +47,12 @@ describe 'lvm' do
         ensure       => present,
         volume_group => 'myvg',
         size         => '4096K',
+      }
+
+      exec { 'mknodes':
+        command => '/sbin/vgscan --mknodes',
+        creates => '/dev/mapper/myvg-mylv',
+        require => Logical_volume['mylv']
       }
       EOS
 
