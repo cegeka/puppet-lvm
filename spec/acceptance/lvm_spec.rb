@@ -6,7 +6,8 @@ describe 'lvm' do
     it 'should work with no errors' do
       pp = <<-EOS
       class { '::lvm':
-        package_ensure => 'installed'
+        package_ensure  => 'installed',
+        manage_pkg      => true
       }
 
       exec { 'create_lvm.fs':
