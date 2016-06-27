@@ -55,7 +55,7 @@ describe 'lvm' do
     end
 
     describe file '/dev/mapper/myvg-mylv' do
-      it { is_expected.to be_file }
+      it { is_expected.to be_symlink }
     end
 
   end
