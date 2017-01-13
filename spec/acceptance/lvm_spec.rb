@@ -17,13 +17,13 @@ describe 'lvm' do
       exec { 'create_lvm.fs':
         command => '/bin/dd if=/dev/zero of=/dev/lvm.fs bs=1024k count=1',
         creates => '/dev/lvm.fs',
-        require => Class['::lvm']
+        require => [Class['::lvm'],Package['e2fsprogs']]
       }
 
       exec { 'create_loop.fs':
         command => '/sbin/losetup /dev/loop6 /dev/lvm.fs',
         creates => '/dev/loop6',
-        require => [Exec['create_lvm.fs'],Package['e2fsprogs']]
+        require => Exec['create_lvm.fs']
       }
 
       exec { 'scan_vg':
