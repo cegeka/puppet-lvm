@@ -13,6 +13,7 @@ describe provider_class do
   LV      VG       Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
   lv_root VolGroup -wi-ao----  18.54g
   lv_swap VolGroup -wi-ao---- 992.00m
+  data    data     -wi-ao---- 992.00m  
   EOS
 
   describe 'self.instances' do
@@ -27,6 +28,30 @@ describe provider_class do
     end
   end
 
+  describe 'when checking existence' do
+    it "should return 'true', lv 'data' in vg 'data' exists" do
+      @resource.expects(:[]).with(:name).returns('data')
+      @resource.expects(:[]).with(:volume_group).returns('data').at_least_once
+      @provider.class.stubs(:lvs).with('data').returns(lvs_output)
+      expect(@provider.exists?).to be > 10
+    end
+    it "should return 'nil', lv 'data' in vg 'myvg' does not exist" do
+      @resource.expects(:[]).with(:name).returns('data')
+      @resource.expects(:[]).with(:volume_group).returns('myvg').at_least_once
+      @provider.class.stubs(:lvs).with('myvg').returns(lvs_output)
+      expect(@provider.exists?).to be_nil
+    end
+  end
+
+  describe 'when inspecting' do
+    it "strips zeros from lvs output" do
+      @resource.expects(:[]).with(:name).returns('mylv').at_least_once
+      @resource.expects(:[]).with(:volume_group).returns('myvg').at_least_once
+      @resource.expects(:[]).with(:size).returns('2.5g').at_least_once
+      @provider.expects(:lvs).with('--noheading', '--unit', 'g', '/dev/myvg/mylv').returns(' 2.50g').at_least_once
+      expect(@provider.size).to eq('2.5G')
+    end
+  end
   describe 'when creating' do
     context 'with size' do
       it "should execute 'lvcreate' with a '--size' option" do

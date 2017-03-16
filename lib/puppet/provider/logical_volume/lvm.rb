@@ -52,7 +52,10 @@ Puppet::Type.type(:logical_volume).provide :lvm do
     end
 
     def create
-        args = ['-n', @resource[:name]]
+        args = []
+
+        args.push('-n', @resource[:name]) unless @resource[:thinpool]
+
         if @resource[:size]
             args.push('--size', @resource[:size])
         elsif @resource[:initial_size]
@@ -74,6 +77,11 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             args.push('--stripesize', @resource[:stripesize])
         end
 
+	
+
+        if @resource[:poolmetadatasize]
+            args.push('--poolmetadatasize', @resource[:poolmetadatasize])
+        end
 
         if @resource[:mirror]
             args.push('--mirrors', @resource[:mirror])
@@ -98,7 +106,7 @@ Puppet::Type.type(:logical_volume).provide :lvm do
         end
 
         if @resource[:persistent]
-            # if persistent param is true, set arg to "y", otherwise set to "n"
+            # if persistent param is true, set arg to "y", otherwise set to "n"
             args.push('--persistent', [:true, true, "true"].include?(@resource[:persistent]) ? 'y' : 'n')
         end
 
@@ -110,7 +118,12 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             args.push('--type', @resource[:type])
         end
 
-        args << @resource[:volume_group]
+        if @resource[:thinpool]
+            args.push('--thin')
+            args << @resource[:volume_group] + "/" + @resource[:name]
+        else
+            args << @resource[:volume_group]
+        end
         lvcreate(*args)
     end
 
@@ -135,7 +148,7 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             if $2.to_i == 00
                 return $1 + unit.capitalize
             else
-                return $1 + '.' + $2 + unit.capitalize
+                return $1 + '.' + $2.sub(/0+$/, '') + unit.capitalize
             end
         end
     end
@@ -280,7 +293,9 @@ Puppet::Type.type(:logical_volume).provide :lvm do
     private
 
     def lvs_pattern
-        /\s+#{Regexp.quote @resource[:name]}\s+/
+        # lvs output format:
+        # LV      VG       Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+        /\s+#{Regexp.quote @resource[:name]}\s+#{Regexp.quote @resource[:volume_group]}\s+/
     end
 
     def path

@@ -2,8 +2,10 @@
 #
 define lvm::volume_group (
   $physical_volumes,
+  $createonly       = false,
   $ensure           = present,
   $logical_volumes  = {},
+  $followsymlinks   = false,
 ) {
 
   validate_hash($logical_volumes)
@@ -12,13 +14,27 @@ define lvm::volume_group (
     fail("lvm::volume_group \$name can't be undefined")
   }
 
-  physical_volume { $physical_volumes:
-    ensure => $ensure,
-  } ->
+  if is_hash($physical_volumes) {
+    create_resources(
+      'lvm::physical_volume',
+      $physical_volumes,
+      {
+        ensure           => $ensure,
+      }
+    )
+  }
+  else {
+    physical_volume { $physical_volumes:
+      ensure => $ensure,
+    }
+  }
+
 
   volume_group { $name:
     ensure           => $ensure,
+    createonly       => $createonly,
     physical_volumes => $physical_volumes,
+    followsymlinks   => $followsymlinks,
   }
 
   create_resources(
