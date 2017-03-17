@@ -76,9 +76,14 @@ Puppet::Type.newtype(:logical_volume) do
     end
   end
 
-  newparam(:thinpool, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+  newparam(:thinpool) do
     desc "Set to true to create a thin pool"
-    defaultto false 
+    validate do |value|
+      unless [:true, true, "true", :false, false, "false"].include?(value)
+        raise ArgumentError , "thinpool must be either be true or false"
+      end
+    end
+    defaultto :false
   end
 
   newparam(:poolmetadatasize) do
