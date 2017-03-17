@@ -3,7 +3,7 @@
 define lvm::volume_group (
   $physical_volumes,
   $ensure           = present,
-  $logical_volumes  = {},
+  $logical_volumes  = {}
 ) {
 
   validate_hash($logical_volumes)
