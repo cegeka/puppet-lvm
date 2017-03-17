@@ -7,7 +7,7 @@ define lvm::logical_volume (
   $ensure            = present,
   $options           = 'defaults',
   $pass              = '2',
-  $dump              = '0',
+  $dump              = '1',
   $fs_type           = 'ext4',
   $mkfs_options      = undef,
   $mountpath         = "/${name}",
@@ -21,13 +21,6 @@ define lvm::logical_volume (
   $range             = undef,
   $size_is_minsize   = undef,
   $type              = undef,
-  $thinpool          = false,
-  $poolmetadatasize  = undef,
-  $mirror            = undef,
-  $mirrorlog         = undef,
-  $no_sync           = undef,
-  $region_size       = undef,
-  $alloc             = undef,
 ) {
 
   validate_bool($mountpath_require)
@@ -78,24 +71,17 @@ define lvm::logical_volume (
   }
 
   logical_volume { $name:
-    ensure           => $ensure,
-    volume_group     => $volume_group,
-    size             => $size,
-    initial_size     => $initial_size,
-    stripes          => $stripes,
-    stripesize       => $stripesize,
-    readahead        => $readahead,
-    extents          => $extents,
-    range            => $range,
-    size_is_minsize  => $size_is_minsize,
-    type             => $type,
-    thinpool         => $thinpool,
-    poolmetadatasize => $poolmetadatasize,
-    mirror           => $mirror,
-    mirrorlog        => $mirrorlog,
-    no_sync          => $no_sync,
-    region_size      => $region_size,
-    alloc            => $alloc
+    ensure          => $ensure,
+    volume_group    => $volume_group,
+    size            => $size,
+    initial_size    => $initial_size,
+    stripes         => $stripes,
+    stripesize      => $stripesize,
+    readahead       => $readahead,
+    extents         => $extents,
+    range           => $range,
+    size_is_minsize => $size_is_minsize,
+    type            => $type
   }
 
   if $createfs {
@@ -117,10 +103,10 @@ define lvm::logical_volume (
         }
       } else {
         exec { "swapoff for '${mount_title}'":
-          path    => [ '/bin', '/usr/bin', '/sbin' ],
-          command => "swapoff ${lvm_device_path}",
-          onlyif  => "grep `readlink -f ${lvm_device_path}` /proc/swaps",
-          notify  => Mount[$mount_title],
+          path      => [ '/bin', '/usr/bin', '/sbin' ],
+          command   => "swapoff ${lvm_device_path}",
+          onlyif    => "grep `readlink -f ${lvm_device_path}` /proc/swaps",
+          subscribe => Mount[$mount_title],
         }
       }
     } else {
