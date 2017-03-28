@@ -15,38 +15,39 @@ describe 'lvm' do
       }
 
       exec { 'create_lvm.fs':
-        command => '/bin/dd if=/dev/zero of=/dev/lvm.fs bs=1024k count=1',
-        creates => '/dev/lvm.fs',
-        require => Class['::lvm']
+        command => '/bin/dd if=/dev/zero of=/tmp/lvm.fs bs=10M count=1',
+        creates => '/tmp/lvm.fs',
+        require => [Class['::lvm'],Package['e2fsprogs']]
       }
 
       exec { 'create_loop.fs':
-        command => '/sbin/losetup /dev/loop6 /dev/lvm.fs',
+        command => '/sbin/losetup /dev/loop6 /tmp/lvm.fs',
         creates => '/dev/loop6',
-        require => [Exec['create_lvm.fs'],Package['e2fsprogs']]
+        require => Exec['create_lvm.fs']
+      }
+
+      physical_volume { '/dev/loop6':
+        ensure  => present,
+        require => Exec['create_loop.fs']
       }
 
       exec { 'scan_vg':
         command => '/sbin/vgscan',
         unless  => '/sbin/vgs | grep myvg',
-        require => Exec['create_loop.fs']
-      }
-
-
-      physical_volume { '/dev/loop6':
-        ensure  => present,
-        require => Exec['scan_vg']
+        require => Physical_volume['/dev/loop6']
       }
 
       volume_group { 'myvg':
         ensure           => present,
         physical_volumes => '/dev/loop6',
+        require          => Physical_volume['/dev/loop6']
       }
 
       logical_volume { 'mylv':
         ensure       => present,
         volume_group => 'myvg',
         size         => '4096K',
+        require      => Volume_group['myvg']
       }
 
       exec { 'mknodes':
@@ -54,6 +55,7 @@ describe 'lvm' do
         creates => '/dev/mapper/myvg-mylv',
         require => Logical_volume['mylv']
       }
+
       EOS
 
       # Run it twice and test for idempotency
