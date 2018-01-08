@@ -322,3 +322,4 @@ Raphaël Pinson <raphael.pinson@camptocamp.com>
 Garrett Honeycutt <code@garretthoneycutt.com>
 
 [More Contributers](https://github.com/puppetlabs/puppetlabs-lvm/graphs/contributors)
+
