@@ -78,7 +78,12 @@ Puppet::Type.newtype(:logical_volume) do
 
   newparam(:thinpool, :boolean => true, :parent => Puppet::Parameter::Boolean) do
     desc "Set to true to create a thin pool"
-    defaultto false 
+    defaultto false
+  end
+
+  newparam(:wipesignatures, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc "Set to true to wipesignatures"
+    defaultto false
   end
 
   newparam(:poolmetadatasize) do

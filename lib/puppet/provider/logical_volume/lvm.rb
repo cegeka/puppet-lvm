@@ -77,7 +77,7 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             args.push('--stripesize', @resource[:stripesize])
         end
 
-	
+
 
         if @resource[:poolmetadatasize]
             args.push('--poolmetadatasize', @resource[:poolmetadatasize])
@@ -123,6 +123,10 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             args << @resource[:volume_group] + "/" + @resource[:name]
         else
             args << @resource[:volume_group]
+        end
+
+        if @resource[:wipesignatures]
+            args.push('--wipesignatures', [:true, true, "true"].include?(@resource[:wipesignatures]) ? 'y' : 'n')
         end
         lvcreate(*args)
     end
