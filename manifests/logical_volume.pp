@@ -59,13 +59,7 @@ define lvm::logical_volume (
     $fixed_mountpath = $mountpath
     $fixed_pass      = $pass
     $fixed_dump      = $dump
-    $mount_ensure    = $ensure ? {
-      'absent' => absent,
-      default  => $mounted ? {
-        true      => mounted,
-        false     => present,
-      }
-    }
+    $mount_ensure    = $mounted
   }
 
   if $ensure == 'present' and $createfs {
