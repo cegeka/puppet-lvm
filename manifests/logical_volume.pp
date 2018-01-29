@@ -12,7 +12,7 @@ define lvm::logical_volume (
   $mkfs_options      = undef,
   $mountpath         = "/${name}",
   $mountpath_require = false,
-  $mounted           = true,
+  $mounted           = 'present',
   $createfs          = true,
   $extents           = undef,
   $stripes           = undef,
