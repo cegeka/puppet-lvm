@@ -58,16 +58,6 @@ Puppet::Type.newtype(:logical_volume) do
     end
   end
 
-  newparam(:resize_extents) do
-    desc "Do resize when setting extents"
-    validate do |value|
-      unless [:true, true, "true", :false, false, "false"].include?(value)
-        raise ArgumentError , "resize_extents must be either be true or false"
-      end
-    end
-    defaultto false
-  end
-
   newproperty(:extents) do
     desc "The number of logical extents to allocate for the logical volume."
     validate do |value|
@@ -76,24 +66,21 @@ Puppet::Type.newtype(:logical_volume) do
       end
     end
     def insync?(is)
-      unless [:true, true, "true"].include?(@resource[:resize_extents])
-        return true
-      end
-       if is =~ /^(\d+(\.\d+)?)(%)?(vg)?$/i
+      if is =~ /^(\d+(\.\d+)?)(%)?(vg)?$/i
         current_value = $1.to_f
         current_percent = !$3.nil?
         current_type = $4.downcase unless $4.nil?
       end
-       if should =~ /^(\d+)(%)?(vg|pvs|free|origin)?$/i
+      if should =~ /^(\d+)(%)?(vg|pvs|free|origin)?$/i
         new_value = $1.to_f
         new_percent = !$2.nil?
         new_type = $3.downcase unless $3.nil?
         if not new_type.nil? and ['origin', 'pvs', 'free'].include?(new_type)
-          warn("Warning: #{new_type} is not supported as extents resize, currently set to #{should} and resize_extents set to #{@resource[:resize_extents]}")
+          warn("Warning: #{new_type} is not supported as extents resize, currently set to #{should}")
           return true
         end
       end
-       new_value <= current_value
+      new_value <= current_value
      end
   end
 

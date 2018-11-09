@@ -29,7 +29,6 @@ define lvm::logical_volume (
   $no_sync           = undef,
   $region_size       = undef,
   $alloc             = undef,
-  $resize_extents    = undef,
 ) {
 
   validate_bool($mountpath_require)
@@ -93,7 +92,6 @@ define lvm::logical_volume (
     no_sync          => $no_sync,
     region_size      => $region_size,
     alloc            => $alloc,
-    resize_extents   => $resize_extents,
   }
 
   if $createfs {
