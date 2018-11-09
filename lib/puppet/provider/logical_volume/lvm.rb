@@ -172,15 +172,15 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             vgs_size[vg_name] ||= 0
             vgs_size[vg_name] += lv_extents_count
         end
-         total_used_lvs_extents = vgs_size.values.inject(:+)
+        total_used_lvs_extents = vgs_size.values.inject(:+)
         # End calculation
-         if !extents_full_type.nil? and extents_full_type.eql? '%vg'
+        if !extents_full_type.nil? and extents_full_type.eql? '%vg'
             current_perc = ((total_used_lvs_extents / total_vgs_extents) * 100).round(0).to_s
             current_value = current_perc + extents_full_type
 
             return current_value
         end
-         return total_used_lvs_extents.to_s
+        return total_used_lvs_extents.to_s
     end
      def extents=(new_extents)
          current_extents = extents()
