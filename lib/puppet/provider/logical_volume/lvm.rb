@@ -156,7 +156,7 @@ Puppet::Type.type(:logical_volume).provide :lvm do
         total_vgs_extents = 0
 
         raw_vgs.split("\n").each do |lvs|
-            if lvs =~ /\s+(\w+)\s+(\d+)\s+(\d+(\.\d+)?)([KMGTPE])\s+(\d+(\.\d+)?)([KMGTPE])/i
+            if lvs =~ /\s+(\w+)\s+(\d+)\s+(<?\d+(\.\d+)?)([KMGTPE])\s+(\d+(\.\d+)?)([KMGTPE])/i
                 vg_name = $1
                 vg_extents_count = $2.to_i
                  lv_size = $3.to_f
