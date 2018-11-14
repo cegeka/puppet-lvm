@@ -206,9 +206,10 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             fail("Decreasing the size requires manual intervention (#{new_extents_value} < #{current_extents_value})")
         end
 
-        lvextend('--extents', new_extent_size, path)
-
-        resizefs(path, new_extent_size)
+        if current_extents_value < new_extents.to_f
+            lvextend('--extents', new_extent_size, path)
+            resizefs(path, new_extent_size)
+        end
     end
 
     def size
