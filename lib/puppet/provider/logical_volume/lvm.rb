@@ -150,23 +150,17 @@ Puppet::Type.type(:logical_volume).provide :lvm do
             extents_size = $1.to_f
             extents_full_type = $2.downcase unless $2.nil?
         end
-        raw_vgs = vgs('--noheading', '-o','name,vg_extent_count,seg_size,vg_extent_size', path)
+        raw_vgs = vgs('--noheading', '-o','name,vg_extent_count,seg_size_pe', path)
         # Calculate the total extents of the Volume Group and the total used extents of the Logical Volume.
         vgs_size = Hash.new
         total_vgs_extents = 0
 
         raw_vgs.split("\n").each do |lvs|
-            if lvs =~ /\s+(\w+)\s+(\d+)\s+<?(\d+(\.\d+)?)([KMGTPE])\s+(\d+(\.\d+)?)([KMGTPE])/i
+            if lvs =~ /\s+(\w+)\s+(\d+)\s+(\d+)/i
                 vg_name = $1
                 vg_extents_count = $2.to_i
-                lv_size = $3.to_f
-                lv_unit = $5.upcase
+                lv_extents_count = $3.to_i
 
-                ex_size = $6.to_f
-                ex_unit = $8.upcase
-
-                # Number of extents in use by LV
-                lv_extents_count = (lv_size / ex_size) * (lvm_size_units[lv_unit] / lvm_size_units[ex_unit])
             end
             total_vgs_extents += vg_extents_count unless vgs_size.keys.include?(vg_name)
             vgs_size[vg_name] ||= 0
