@@ -297,31 +297,6 @@ parameters documented above also apply to AIX systems.
 
 Documented in the ["Tasks" tab](https://forge.puppet.com/puppetlabs/lvm/tasks) on the forge
 
-## Plans
-
-### `lvm::expand`
-
-Executes common tasks for expanding mounts, this can include:
-
-* Creating PVs
-* Adding PVs to VG
-* Extending LV
-* Extending filesystem
-
-**Parameters:**
-
-`server`: *String* The target for the plan
-
-`volume_group`: *String* The volume group to which the logical volume belongs
-
-`logical_volume`: *String* The logical volume which is to be expanded
-
-`additional_size`: *String* How much size to add to the LV. This should be specified in LVM format i.e. "200m" or "2.5g"
-
-`disks`: *Array[String]* Any physical disks that should be added to the volume group as part of the expand process
-
-`resize_fs`: *Boolean* Whether or not to resize the filesystem
-
 ## Limitations
 
 ### Namespacing
