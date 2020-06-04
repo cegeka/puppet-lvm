@@ -144,6 +144,10 @@ Puppet::Type.type(:logical_volume).provide :lvm do
     else
       args << @resource[:volume_group]
     end
+
+    if @resource[:wipesignatures]
+        args.push('--wipesignatures', [:true, true, "true"].include?(@resource[:wipesignatures]) ? 'y' : 'n')
+    end
     lvcreate(*args)
   end
 

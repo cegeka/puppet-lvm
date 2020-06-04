@@ -104,6 +104,11 @@ Puppet::Type.newtype(:logical_volume) do
     end
   end
 
+  newparam(:wipesignatures, :boolean => true, :parent => Puppet::Parameter::Boolean) do
+    desc "Set to true to wipesignatures"
+    defaultto false
+  end
+
   newparam(:poolmetadatasize) do
     desc 'Change the size of logical volume pool metadata'
     validate do |value|

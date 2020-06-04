@@ -28,6 +28,7 @@ define lvm::logical_volume (
   $no_sync                           = undef,
   $region_size                       = undef,
   $alloc                             = undef,
+  $wipesignatures                    = undef,
 ) {
 
   $lvm_device_path = "/dev/${volume_group}/${name}"
@@ -84,6 +85,7 @@ define lvm::logical_volume (
     size_is_minsize  => $size_is_minsize,
     type             => $type,
     thinpool         => $thinpool,
+    wipesignatures   => $wipesignatures,
     poolmetadatasize => $poolmetadatasize,
     mirror           => $mirror,
     mirrorlog        => $mirrorlog,
